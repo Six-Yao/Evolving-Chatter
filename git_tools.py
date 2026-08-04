@@ -53,4 +53,17 @@ def git(cmd: str) -> str:
     parts = shlex.split(cmd)
     if not parts:
         return "用法：传入 git 子命令及参数，例如 'status --short'、'commit -m \"消息\"'"
-    return _run_git(parts)
+    result = _run_git(parts)
+    if result.startswith("git 命令失败"):
+        return result
+    # 成功但 git 无 stdout 输出（如 push 一切正常）时，给出友好提示
+    if not result or result == "(无输出)":
+        verb = parts[0]
+        if verb == "push":
+            return "推送成功，远程已同步"
+        if verb == "pull":
+            return "拉取完成，无新变更"
+        if verb == "commit":
+            return "提交成功"
+        return "执行成功（无输出）"
+    return result

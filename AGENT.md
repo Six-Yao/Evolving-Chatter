@@ -10,3 +10,9 @@
 能力说明：
 - 文件读写走 FilesystemBackend，直接操作项目文件；shell 沙箱不可用，别尝试跑命令。
 - git 操作走 git_tools.py 提供的 git 工具（subprocess 执行，在项目根目录运行）。
+
+经验沉淀（实战踩坑）：
+- git 命令解析必须用 shlex.split（能处理引号），不要用 str.split——否则 'commit -m "带空格的消息"' 会被拆成多个参数。
+- 提交前先 git diff 确认暂存的是最新内容；先改代码再 add 再 commit，顺序反了会把旧代码提交进去（我踩过：修复没进第一次提交）。
+- push 成功时 git 可能无 stdout，工具已对此返回友好提示，别误判成失败。
+- 提交信息带空格/中文没问题，工具已支持引号解析。
