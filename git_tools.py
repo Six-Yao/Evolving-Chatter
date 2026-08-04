@@ -4,6 +4,7 @@
 这样在 FilesystemBackend（无 shell 执行能力）下也能做版本管理。
 """
 
+import shlex
 import subprocess
 from pathlib import Path
 
@@ -49,7 +50,7 @@ def git(cmd: str) -> str:
     - 'pull' / 'push'（同步远程）
     失败时返回以"git 命令失败"开头的错误信息。
     """
-    parts = cmd.split()
+    parts = shlex.split(cmd)
     if not parts:
         return "用法：传入 git 子命令及参数，例如 'status --short'、'commit -m \"消息\"'"
     return _run_git(parts)
