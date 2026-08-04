@@ -1,11 +1,11 @@
-import config
+import config  # noqa: F401  (加载 DEEPSEEK_API_KEY 等环境变量)
 
 import os
+import sys
 
 from deepagents import create_deep_agent
 from deepagents.backends import FilesystemBackend
 from langchain.chat_models import init_chat_model
-from langchain.tools import tool
 from langgraph.checkpoint.memory import InMemorySaver
 
 SYSTEM_PROMPT = """"""
