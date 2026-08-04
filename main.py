@@ -1,8 +1,11 @@
-import config  # noqa: F401  (加载 DEEPSEEK_API_KEY 等环境变量)
+"""main.py: 聊天入口（薄壳）。业务逻辑在 agent_builder / hotreload / session 里。
 
-import os
+热更新（Flask 风格）：改任意 .py / .md 都不会重启进程，
+而是 reload 对应模块 + 重建 agent，对话记忆（session.checkpointer）全程保留。
+"""
+
+import config  # noqa: F401  (加载 DEEPSEEK_API_KEY 等环境变量)
 import sys
-from pathlib import Path
 
 from deepagents import create_deep_agent
 from deepagents.backends import LocalShellBackend
@@ -87,7 +90,7 @@ def extract_text(content_blocks) -> str:
 def chat_once(user_input: str) -> None:
     """发送一条用户消息，流式打印回复。"""
     try:
-        for chunk, _meta in deep_agent.stream(
+        for chunk, _meta in agent_builder.deep_agent.stream(
             {"messages": [{"role": "user", "content": user_input}]},
             config={"configurable": {"thread_id": THREAD_ID}},
             stream_mode="messages",
@@ -103,48 +106,14 @@ def chat_once(user_input: str) -> None:
         print(f"\n[出错了: {exc}]")
 
 
-def restart_process() -> None:
-    """代码文件变了：自动重启进程，让新代码生效。"""
-    print("\n（检测到代码变化，正在自动重启……）")
-    sys.stdout.flush()
-    script = str(Path(__file__))
-    if sys.platform == "win32":
-        import subprocess
-
-        subprocess.Popen([sys.executable, script])
-    else:
-        os.execv(sys.executable, [sys.executable, script])
-    os._exit(0)
-
-
-def check_hot_reload() -> None:
-    """扫描项目：.py 变了自动重启；.md 变了重建 agent（保留记忆）。"""
-    global file_sigs
-    sigs = scan_signatures()
-    prompt_changed = False
-    restart_needed = False
-    for rel, mtime in sigs.items():
-        if file_sigs.get(rel) != mtime:
-            if rel.endswith(".py"):
-                restart_needed = True
-            else:
-                prompt_changed = True
-    file_sigs = sigs
-    if restart_needed:
-        restart_process()
-    if prompt_changed:
-        build_agent()
-        print("（已热更新，新设定生效）")
-
-
 def main() -> None:
-    print("开始对话吧～ 输入 exit / quit / q / 退出 结束，Ctrl+C 也能退出。")
+    print("输入 exit / quit / q / 退出 结束，Ctrl+C 也能退出。")
     print("我可以读取和修改当前目录下的文件，比如：帮我看看 main.py 然后改点什么。")
-    print("改任意 .md 我会热更新；改任意 .py 我会自动重启，项目随便拆。")
+    print("改 .py / .md 都会热更新：新代码立即生效、对话记忆保留（不再重启进程）。")
     print()
 
     while True:
-        check_hot_reload()
+        hotreload.check_hot_reload()
 
         try:
             user_input = input("你 > ").strip()
@@ -164,5 +133,5 @@ def main() -> None:
         print("\n")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__" and not getattr(sys, "_hot_reload_guard", False):
     main()
