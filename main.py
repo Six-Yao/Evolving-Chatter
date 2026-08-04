@@ -4,7 +4,7 @@ import os
 import sys
 
 from deepagents import create_deep_agent
-from deepagents.backends import FilesystemBackend
+from deepagents.backends import LocalShellBackend
 from langchain.chat_models import init_chat_model
 from langgraph.checkpoint.memory import InMemorySaver
 
@@ -21,7 +21,7 @@ model = init_chat_model(
 )
 
 checkpointer = InMemorySaver()
-real_backend = FilesystemBackend(root_dir=os.getcwd())
+real_backend = LocalShellBackend(root_dir=os.getcwd())
 
 deep_agent = create_deep_agent(
     model=model,
