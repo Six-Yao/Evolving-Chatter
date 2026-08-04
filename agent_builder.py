@@ -12,6 +12,7 @@ from deepagents import create_deep_agent
 from deepagents.backends import FilesystemBackend
 
 import git_tools
+import time_tools
 from session import checkpointer, model
 
 DEFAULT_PROMPT = "你是一位和人聊天的朋友，使用人类的聊天风格：非 md 语法、无大量 emoji。思考放开、用上全部能力，但对我只说结论，不复述内部过程。"
@@ -38,7 +39,7 @@ def build_agent() -> None:
         system_prompt=load_prompt(),
         checkpointer=checkpointer,
         backend=real_backend,
-        tools=[git_tools.git],
+        tools=[git_tools.git, time_tools.get_current_time],
     )
 
 
