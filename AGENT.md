@@ -16,3 +16,5 @@
 - 提交前先 git diff 确认暂存的是最新内容；先改代码再 add 再 commit，顺序反了会把旧代码提交进去（我踩过：修复没进第一次提交）。
 - push 成功时 git 可能无 stdout，工具已对此返回友好提示，别误判成失败。
 - 提交信息带空格/中文没问题，工具已支持引号解析。
+- 终端聊天里只打印 AI 回复：stream_mode="messages" 的流里包含工具结果消息（ToolMessage），extract_text 必须按 chunk.type=='ai' 过滤，否则 read_file/edit_file 的返回会刷屏。
+- `git() got an unexpected keyword argument 'v__args'` 是框架机制，不是业务 bug：langchain @tool 底层用 pydantic validate_arguments 包装函数，v__args 是其内部隐藏字段（pydantic/deprecated/decorator.py ALT_V_ARGS）。deepagents 基于 langchain create_agent，工具调用链路过该兼容层时会触发。规避：工具函数加 **kwargs 吞掉杂项参数。

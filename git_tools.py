@@ -38,7 +38,7 @@ def _run_git(args: list[str]) -> str:
 
 
 @tool
-def git(cmd: str) -> str:
+def git(cmd: str, **kwargs) -> str:
     """在项目根目录执行任意 git 命令，返回结果文本。
 
     用法：传入 git 子命令及参数，例如：
@@ -49,7 +49,11 @@ def git(cmd: str) -> str:
     - 'commit -m "xxx"'（提交）
     - 'pull' / 'push'（同步远程）
     失败时返回以"git 命令失败"开头的错误信息。
+
+    **kwargs 仅用于吞掉 langchain/pydantic 工具调用链注入的杂项参数
+    （如 validate_arguments 的内部字段 v__args），避免 unexpected keyword 报错。
     """
+    del kwargs  # 忽略框架注入的杂项参数
     parts = shlex.split(cmd)
     if not parts:
         return "用法：传入 git 子命令及参数，例如 'status --short'、'commit -m \"消息\"'"

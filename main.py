@@ -95,6 +95,10 @@ def chat_once(user_input: str) -> None:
             config={"configurable": {"thread_id": THREAD_ID}},
             stream_mode="messages",
         ):
+            # 只打印 AI 的回复文本，跳过工具结果等中间消息，
+            # 否则 read_file/edit_file 的返回内容会刷屏（如 "Successfully replaced..."）。
+            if getattr(chunk, "type", "") != "ai":
+                continue
             text = extract_text(getattr(chunk, "content_blocks", None) or [])
             if text:
                 sys.stdout.write(text)
