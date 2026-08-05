@@ -16,3 +16,5 @@
 - 2026-07-15 21:45 / 提示词外置 / 新增 memory/prompts/{base,reflect,evolve}.md；prompts.py 改为 load_prompt() 每次从文件读取、内置文本仅作兜底；mem.py / main.py 改用 load_prompt / 用户问"下一轮你再有什么修改我又得重启？"——提示词是高频改动，不该让用户反复重启；外置为文件后改提示词即时生效，只有代码改动才需重启。
 - 2026-07-15 21:50 / 热重载架构 / 新增 core.py（全部业务逻辑：build_agent/extract_text/run_reflection/run_evolution/handle_line）；main.py 精简为启动器：热重载检测（每轮对比 prompts/mem/tools/core 的 mtime，变化则 importlib.reload，按依赖顺序）+ 输入循环；turn_count 由 main 持有 state 字典，重载不重置 / 用户继续追问"那下一轮改了代码我又得重启啊"——上一条方案的逻辑漏洞：改代码恰是我的核心工作，"只有改代码才需重启"等于还是让用户当运维。热重载后，改 core/prompts/mem/tools 全部即时生效，只有 main.py 自身（已极小且稳定）需重启。
 - 2026-07-15 21:50 / 修复 bug / core.py run_reflection 用 prompts.load_prompt("reflect") / 原 main.py 第 89 行仍引用已删除的 prompts.REFLECT_PROMPT，会导致 AttributeError；重构时一并修复。
+- 2026-07-15 21:55 / prompts.py / BANNER / 原：大号 box-drawing 框（╔═╗ 5 行）；现：单行简洁文本 / 用户反馈"每次启动都得看这一段吗"，横幅信息冗余且碍眼，精简为一行。
+- 2026-07-15 21:55 / .gitignore / 追加 memory/chat_history.jsonl / 对话历史是运行数据，不应入库；此前 untracked 未暴露问题，现在明确忽略。
