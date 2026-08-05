@@ -18,3 +18,4 @@
 - 2026-07-15 21:50 / 修复 bug / core.py run_reflection 用 prompts.load_prompt("reflect") / 原 main.py 第 89 行仍引用已删除的 prompts.REFLECT_PROMPT，会导致 AttributeError；重构时一并修复。
 - 2026-07-15 21:55 / prompts.py / BANNER / 原：大号 box-drawing 框（╔═╗ 5 行）；现：单行简洁文本 / 用户反馈"每次启动都得看这一段吗"，横幅信息冗余且碍眼，精简为一行。
 - 2026-07-15 21:55 / .gitignore / 追加 memory/chat_history.jsonl / 对话历史是运行数据，不应入库；此前 untracked 未暴露问题，现在明确忽略。
+- 2026-08-05 17:50 / tools.py + core.py / 新增 get_time 工具（datetime.now() 读系统时钟，返回本地时区时间），build_agent 的 tools 改为 [run_git, get_time] / 用户考问"明天再问你几点你该怎么答"——靠 git 时间戳推断是权宜之计（新会话无新提交就无从推断），直接给自己加读系统时钟的能力才是根治。tools/core 改动走热重载，无需重启。
