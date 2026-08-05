@@ -1,6 +1,6 @@
 """进化体 · 自定义工具集。
 
-拆分自 main.py v2.0：目前包含受限 git 执行工具 run_git。
+拆分自 main.py v2.0：目前包含受限 git 执行工具 run_git 与系统时钟工具 get_time。
 边界写死在机制里，不靠自觉。
 """
 
@@ -63,3 +63,13 @@ def run_git(command: str) -> str:
         return "错误：命令执行超时（>30s）"
     except Exception as exc:
         return f"执行失败：{exc}"
+    """获取当前系统时间（本地时区），返回精确的日期与时刻。
+
+    用于回答"现在几点了"这类问题。系统时钟是可靠来源，
+    优于用 git 提交时间戳等间接推断（后者有误差且依赖近期有提交）。
+    """
+    from datetime import datetime
+
+    now = datetime.now().astimezone()
+    tz = now.strftime("%Z") or f"UTC{now.strftime('%z')}"
+    return now.strftime("%Y-%m-%d %H:%M:%S") + f" {tz}"

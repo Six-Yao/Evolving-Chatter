@@ -39,7 +39,7 @@ def build_agent(model, backend):
         model=model,
         system_prompt=mem.build_system_prompt(),
         backend=backend,
-        tools=[tools.run_git],
+        tools=[tools.run_git, tools.get_time],
     )
 
 
